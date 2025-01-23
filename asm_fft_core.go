@@ -3,6 +3,7 @@ package fftg
 // fftInPlaceGeneric is a top-level function for FFT.
 func fftInPlaceGeneric(coeffs []complex128, tw []complex128) {
 	N := len(coeffs)
+	w := 0
 
 	t := N
 	for m := 1; m < N; m <<= 1 {
@@ -11,9 +12,10 @@ func fftInPlaceGeneric(coeffs []complex128, tw []complex128) {
 			j1 := i * t << 1
 			j2 := j1 + t
 			for j := j1; j < j2; j++ {
-				U, V := coeffs[j], coeffs[j+t]*tw[m+i-1]
+				U, V := coeffs[j], coeffs[j+t]*tw[w]
 				coeffs[j], coeffs[j+t] = U+V, U-V
 			}
+			w++
 		}
 	}
 }
@@ -21,6 +23,7 @@ func fftInPlaceGeneric(coeffs []complex128, tw []complex128) {
 // invfftInPlaceGeneric is a top-level function for inverse FFT.
 func invfftInPlaceGeneric(coeffs []complex128, twInv []complex128) {
 	N := len(coeffs)
+	w := 0
 
 	t := 1
 	for m := N; m > 1; m >>= 1 {
@@ -30,9 +33,10 @@ func invfftInPlaceGeneric(coeffs []complex128, twInv []complex128) {
 			j2 := j1 + t
 			for j := j1; j < j2; j++ {
 				U, V := coeffs[j], coeffs[j+t]
-				coeffs[j], coeffs[j+t] = U+V, (U-V)*twInv[h+i-1]
+				coeffs[j], coeffs[j+t] = U+V, (U-V)*twInv[w]
 			}
 			j1 += t << 1
+			w++
 		}
 		t <<= 1
 	}
