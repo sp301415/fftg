@@ -1,0 +1,70 @@
+//go:build amd64 && !purego
+
+#include "textflag.h"
+
+TEXT ·cmplxToFloat4AssignAVX2(SB), NOSPLIT, $0-48
+	MOVQ v_base+0(FP), AX
+	MOVQ vOut_base+24(FP), BX
+
+	MOVQ vOut_len+32(FP), DX
+
+	XORQ SI, SI
+	JMP  loop_end
+
+loop_body:
+	VMOVUPD (AX)(SI*8), Y0
+	VMOVUPD 32(AX)(SI*8), Y1
+
+	VPERM2F128 $0b00000000, Y0, Y0, Y2
+	VPERM2F128 $0b00010001, Y0, Y0, Y3
+
+	VSHUFPD $0b1100, Y3, Y2, Y4
+
+	VPERM2F128 $0b00000000, Y1, Y1, Y5
+	VPERM2F128 $0b00010001, Y1, Y1, Y6
+
+	VSHUFPD $0b1100, Y6, Y5, Y7
+
+	VPERM2F128 $0b00000010, Y4, Y7, Y8
+	VPERM2F128 $0b00010011, Y4, Y7, Y9
+
+	VMOVUPD Y8, (BX)(SI*8)
+	VMOVUPD Y9, 32(BX)(SI*8)
+
+	ADDQ $8, SI
+
+loop_end:
+	CMPQ SI, DX
+	JL   loop_body
+
+	RET
+
+TEXT ·float4ToCmplxAssignAVX2(SB), NOSPLIT, $0-48
+	MOVQ v_base+0(FP), AX
+	MOVQ vOut_base+24(FP), BX
+
+	MOVQ v_len+8(FP), DX
+
+	XORQ SI, SI
+	JMP  loop_end
+
+loop_body:
+	VMOVUPD (AX)(SI*8), Y0
+	VMOVUPD 32(AX)(SI*8), Y1
+
+	VSHUFPD $0b0000, Y1, Y0, Y2
+	VSHUFPD $0b1111, Y1, Y0, Y3
+
+	VPERM2F128 $0b00100000, Y3, Y2, Y4
+	VPERM2F128 $0b00110001, Y3, Y2, Y5
+
+	VMOVUPD Y4, (BX)(SI*8)
+	VMOVUPD Y5, 32(BX)(SI*8)
+
+	ADDQ $8, SI
+
+loop_end:
+	CMPQ SI, DX
+	JL   loop_body
+
+	RET
