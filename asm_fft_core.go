@@ -11,7 +11,7 @@ func fftInPlaceGeneric(coeffs []complex128, tw []complex128) {
 			j1 := i * t << 1
 			j2 := j1 + t
 			for j := j1; j < j2; j++ {
-				U, V := coeffs[j], coeffs[j+t]*tw[i]
+				U, V := coeffs[j], coeffs[j+t]*tw[m+i-1]
 				coeffs[j], coeffs[j+t] = U+V, U-V
 			}
 		}
@@ -30,7 +30,7 @@ func invfftInPlaceGeneric(coeffs []complex128, twInv []complex128) {
 			j2 := j1 + t
 			for j := j1; j < j2; j++ {
 				U, V := coeffs[j], coeffs[j+t]
-				coeffs[j], coeffs[j+t] = U+V, (U-V)*twInv[i]
+				coeffs[j], coeffs[j+t] = U+V, (U-V)*twInv[h+i-1]
 			}
 			j1 += t << 1
 		}

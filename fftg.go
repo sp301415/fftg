@@ -1,7 +1,9 @@
 // package fftg impelments the Fast Fourier Transform (FFT) in Go.
 package fftg
 
-import "math"
+import (
+	"math"
+)
 
 const (
 	// MinDegree is the minimum degree of polynomial that Transformers can handle.
@@ -98,7 +100,7 @@ func (fft *FourierTransformer) Forward(v []complex128) []complex128 {
 // ForwardAssign computes the fourier transform of v and writes it to vOut.
 // Input should be in natural order, and output will be in bit-reversed order.
 func (fft *FourierTransformer) ForwardAssign(v []complex128, vOut []complex128) {
-	if len(v) != fft.degree {
+	if len(v) != fft.degree && len(vOut) != fft.degree {
 		panic("invalid length of input vector")
 	}
 
@@ -122,7 +124,7 @@ func (fft *FourierTransformer) Inverse(v []complex128) []complex128 {
 // Input should be in bit-reversed order, and output will be in natural order.
 // The output vector is NOT normalized.
 func (fft *FourierTransformer) InverseAssign(v []complex128, vOut []complex128) {
-	if len(v) != fft.degree {
+	if len(v) != fft.degree && len(vOut) != fft.degree {
 		panic("invalid length of input vector")
 	}
 
